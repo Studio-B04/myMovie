@@ -1,19 +1,20 @@
 <script>
   import { SearchMovie } from "$lib/api";
   import Grid from "@components/Grid/Grid.svelte";
+  import Button from "@components/Button/Button.svelte";
+  import Title from "@components/Title/Title.svelte";
+  import MovieCard from "@components/MovieCard/MovieCard.svelte";
+  import Latest from "@components/Latest/Latest.svelte";
+
   
   let query = '';
   let data = null;
   let loading = false;
   let error = undefined;
 
-  $: results = data?.results || [];
-  $: page = data?.page || 1;
-  $: total_pages = data?.total_pages || 1;
-  $: total_results = data?.total_results || 0;
-
   async function search(page) {
     loading = true;
+
     data = await SearchMovie(query, page)
       .catch((err) => { 
         error = err;
@@ -23,107 +24,80 @@
         loading = false;
       });
   }
-
-  console.log(data);
-  
 </script>
 
-<h2>
+
+<Title size="xl" level={2} align="center">
   Bienvenue sur le Portail MyMovie
-</h2>
+</Title>
 
-<section>
-  <strong>Retrouvez toutes les informations sur le Cinéma.</strong>
+<Title size="sm" level={3} align="center">
+  Le site de référence du cinéma ! Retrouvez toutes les informations sur vos films préférés.
+</Title>
 
-  <div>
-    <input type="search" bind:value={query} on:keydown={e => e.key === "Enter" && query.length >= 3 && search(1)}>
-    <button on:click={() => search(1)} disabled={query.length < 3 ? 'disabled' : undefined}>Chercher</button>
-  </div>
+
+<form>
+  <input type="search" bind:value={query} on:keydown={e => e.key === "Enter" && query.length >= 3 && search(1)}>
+  <Button action={() => search(1)} disabled={query.length < 3 ? 'disabled' : undefined}>
+    Chercher
+  </Button>
+</form>
+
+
+
+<section class="home">
 
   {#if loading}
     recherche...
   {/if}
 
   {#if error}
-    <h3>Une erreur s'est produite : </h3>
-    <p>{error} </p>
+    <Title size="sm" align="center">{error}</Title>
   {/if}
 
   {#if !error && !loading && data}
-    {#if total_results === 0 }
-      <h3>Aucun film ne correspond à votre recherche...</h3>
+    {#if data?.total_results === 0 }
+      <Title size="sm" align="center">Aucun film ne correspond à votre recherche...</Title>
+    {:else}
+    
+      {#if data?.total_results === 1}
+        <Title size="sm" align="center">1 film trouvé pour "{query}" :</Title>
       {:else}
-      
-      {#if total_results === 1}
-        <h3>1 film correspond à votre recherche :</h3>
-        {:else}
-        <h3>{total_results} films correspondent à votre recherche :</h3>
+        <Title size="sm" align="center">{data?.total_results} films trouvés pour "{query}" :</Title>
       {/if}
       
-      <Grid items={results} />
+      <Grid width="300px">
+        {#each data?.results as {id, original_title, overview, poster_path, release_date, original_language, vote_average} (id)}
+          <li>
+            <a href="/film/{id}" >
+              <MovieCard 
+                {id} 
+                title={original_title} 
+                image={poster_path} 
+                description={overview} 
+                date={release_date} 
+                language={original_language}
+                score={vote_average}
+              />
+            </a>
+          </li>  
+        {/each}
+      </Grid>
 
-      {#if page < total_pages}
-        <button class="pagination" disabled={loading} on:click={() => search(page + 1)}>
-          Voir les films suivants
-        </button>
+      {#if data?.page < data?.total_pages}
+        <Button disabled={loading} action={() => search(data?.page + 1)}>Voir les films suivants</Button>
       {/if}
     {/if}
   {/if}
 </section>
 
+<hr>
+
+<section class="movie__section" id="similar">
+  <Title level={3} size="xl">Les films tendances</Title>
+  <Latest max="10"/>
+</section>
 
 <style>
-  h2 {
-    margin-block-end: 30px;
-  }
-
-  h3 {
-    margin-block: 20px;
-  }
-
-  section {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    align-items: center;
-
-    div {
-      border: 2px solid currentColor;
-      display: flex;
-
-      input, button {
-        font-size: 20px;
-        padding: 0.5em;
-        line-height: 1;
-        border: none;
-      }
-
-      input:focus-visible {
-        outline: none;
-        background-color: lightcyan;
-      }
-
-      button {
-        background-color: #ccc;
-        border-inline-start: 2px solid currentColor;
-       
-        &[disabled] {
-          opacity: 1;
-          color: inherit;
-          background-color: #eee;
-          cursor: not-allowed;
-        }
-      }
-    }
-
-    .pagination {
-      margin-block-start: 20px;
-      appearance: none;
-      padding: 0.75em 1.5em;
-      font-size: 1.15em;
-      color: white;
-      background-color: darkslategrey;
-      border: none;
-    }
-  }
+  @import './+page.scss';
 </style>

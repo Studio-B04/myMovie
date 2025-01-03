@@ -1,279 +1,141 @@
 <script>
   import { onMount } from 'svelte';
+  import Image from '@components/Image/Image.svelte';
   import Pill from '@components/Pill/Pill.svelte';
   import Grid from '@components/Grid/Grid.svelte';
   import Stars from '@components/Stars/Stars.svelte';
-  import { GetCreditsByFilmID, GetSimilarID } from '$lib/api.js';
+  import Title from '@components/Title/Title.svelte';
+  import Reviews from '@components/Reviews/Reviews.svelte';
+  import Credits from '@components/Credits/Credits.svelte';
+  import Similar from '@components/Similar/Similar.svelte';
+  import Photos from '@components/Photos/Photos.svelte';
+  import Videos from '@components/Videos/Videos.svelte';
+  import { formatDate } from '$lib/date.js';
 
   export let data = {};
   let mounted = false
-  
-  const {
-    id,
-    title,
-    backdrop_path,
-    poster_path,
-    production_countries,
-    original_title,
-    tagline,
-    budget, 
-    overview,
-    production_companies,
-    genres,
-    popularity,
-    vote_count
-  } = data 
-
-  $: poster = !poster_path || poster_path === "" 
-    ? "https://placehold.co/500x750?text=Image+Manquante" 
-    : `https://image.tmdb.org/t/p/w500${poster_path}`;
 
   onMount(() => mounted = true)
-  
 </script>
 
-<header>
-  <img src={poster} alt="affiche du film {title}">
-  <div>
-    <h1>
-      {title}
-      {#if title !== original_title}
-        <small>({original_title})</small>
+<div class="movie" id={data.id}>
+  <header class="movie__header">
+    <div class="movie__header__image">
+      <Image src={data.poster_path} alt="affiche du film {data.title}" width={400}/>
+    </div>
+
+    <div class="movie__header__details">
+      <!-- TITLE -->
+      <svelte:element this={data.homepage ? "a" : "div"} class="movie__header__details__title" href={data.homepage || undefined} target={data.homepage ? "_blank" : undefined}>
+        <Title level={2} size="xxl">
+          {data.title} 
+          {#if data.title !== data.original_title}
+            <small>({data.original_title})</small>
+          {/if}
+
+          {#if data.tagline}
+            <em>“{data.tagline}”</em>
+          {/if}
+        </Title>
+      </svelte:element>
+
+      <!-- COUNTRY -->
+      {#if data.production_countries}
+        <div class="movie__header__details__countries">
+          {#each data.production_countries as {iso_3166_1, name} (iso_3166_1)}
+          <img src="https://flagsapi.com/{iso_3166_1.toUpperCase()}/shiny/64.png" alt={name}/>
+          {/each}
+        </div>
       {/if}
-    </h1>
-    
-    <div class="stars">
-      <Stars score={popularity/20}/>
+
+      <!-- REVIEWS -->
+      {#if data.vote_average && data.vote_count}
+        <a class="movie__header__details__reviews" href="#reviews">
+          <Stars score={data.vote_average/2}/> {Math.round(data.vote_average*100)/100}/10 <small>({data.vote_count} avis.)</small>
+        </a>
+      {/if}
+
+      <!-- RELEASE -->
+      {#if data.release_date}
+        <div class="movie__header__details__remease">
+          <strong>Date de sortie :</strong> {formatDate(data.release_date, 'D dd MM yyyy.')}
+        </div>
+      {/if}
+
+      <!-- PRODUCTION -->
+      {#if data.production_companies}
+        <strong>Production :</strong>
+        <ul class="movie__header__details__production">
+          {#each data.production_companies as {id, name, origin_country} (id)}
+            <li {id}>{name} 
+              {#if origin_country}
+                <small>({origin_country})</small>
+              {/if}
+            </li>
+          {/each}
+        </ul>
+      {/if}
+
+      <!-- OVERVIEW -->
+      {#if data.overview}
+        <p class="movie__header__details__overview">
+          {data.overview}
+        </p>
+      {/if}
+
+      <!-- GENRES -->
+      {#if data.genres}
+        <div class="movie__header__details__genres">
+          {#each data.genres as genre}
+            <Pill label={genre.name}/>
+          {/each}
+        </div>
+      {/if}
     </div>
-    
-    <blockquote>"{tagline}"</blockquote>
-
-    <div class="meta">
-
-      <div class="countries">
-        {#each production_countries as country}
-          <div class="country">
-            <img src="https://flagsapi.com/{country.iso_3166_1}/flat/64.png" alt="">
-            <span>{country.name}</span>
-          </div>
-        {/each}
-      </div>
-
-      <div class="companies">
-        {#each production_companies as {name, logo_path}}
-          <div class="company">
-            <img src="https://image.tmdb.org/t/p/w500{logo_path}" alt="">
-            <span>{name}</span>
-          </div>
-        {/each}
-      </div>
-
-      Budget: {budget} $
-    </div>
-  </div>
-</header>
+  </header>
 
 
-<div class="genres">
-  {#each genres as {name}}
-    <Pill label={name} />
-  {/each}
+  {#if mounted}
+
+  <section class="movie__section" id="photos">
+    <Title level={3} size="xl">Les photos</Title>
+    <Photos movieID={data.id} max={12} filter="backdrops" />
+  </section>
+
+  <section class="movie__section" id="affiches">
+    <Title level={3} size="xl">Les vidéos</Title>
+    <Videos movieID={data.id} max={2} filter="youtube" />
+  </section>
+
+  <section class="movie__section" id="affiches">
+    <Title level={3} size="xl">Les affiches du film</Title>
+    <Photos movieID={data.id} max={3} filter="posters" />
+  </section>
+
+  <section class="movie__section" id="similar">
+    <Title level={3} size="xl">Le casting</Title>
+    <Credits movieID={data.id} filter="cast" />
+  </section>
+
+  <section class="movie__section" id="similar">
+    <Title level={3} size="xl">L'équipe technique</Title>
+    <Credits movieID={data.id} filter="crew" />
+  </section>
+
+  <section class="movie__section" id="reviews">
+    <Title level={3} size="xl">Les derniers avis</Title>
+    <Reviews movieID={data.id} />
+  </section>
+
+  <section class="movie__section" id="similar">
+    <Title level={3} size="xl">Les films dans le même genre</Title>
+    <Similar movieID={data.id} />
+  </section>
+  {/if}
+
 </div>
 
-<p>{overview}</p>
 
-
-{#if mounted}
-
-  <hr>
-
-  <h3>Casting :</h3>
-  {#await GetCreditsByFilmID(id)}
-    Chargement ...
-  {:then {cast}}
-    {#if cast}
-      <ul class="team">
-    {console.log(cast)}
-
-        {#each cast as { id, character, name, profile_path }}
-          {@const src = !profile_path || profile_path === "" 
-            ? "https://placehold.co/200x300?text=Image+Manquante" 
-            : `https://image.tmdb.org/t/p/w500${profile_path}`
-          }
-           <li {id}>
-            <img {src} alt="">
-            <div>{name}, <small><strong>"{character}"</strong></small></div>
-           </li>
-        {/each}
-      </ul>
-    {:else}
-      <strong>information non disponible.</strong>
-    {/if}
-  {/await}
-
-  <hr>
-
-  <h3>Équipe technique :</h3>
-  {#await GetCreditsByFilmID(id)}
-    Chargement ...
-  {:then {crew}}
-    {#if crew}
-      <ul class="team">
-        {#each crew as { id, job, name, profile_path }}
-        {@const src = !profile_path || profile_path === "" 
-          ? "https://placehold.co/200x300?text=Image+Manquante" 
-          : `https://image.tmdb.org/t/p/w500${profile_path}`
-        }
-          <li {id}>
-            <img {src} alt="">
-            <div>{name}, <small><strong>"{job}"</strong></small></div>
-          </li>
-        {/each}
-      </ul>
-    {:else}
-      <strong>information non disponible.</strong>
-    {/if}
-  {/await}
-
-  <hr>
-
-  <h3>Films similaires :</h3>
-  {#await GetSimilarID(id)}
-    Chargement ...
-  {:then data}
-    {#if data?.results.length}
-      <Grid items={data.results} />
-    {:else}
-      <strong>Il n'y a aucun film simillaire à celui ci.</strong>
-    {/if}
-  {/await}
-{/if}
-
-<style>
-  header {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 30px;
-    width: 100%;
-    z-index: 1;
-    padding: 40px;
-    
-    img {
-      width: 100% ;
-      max-width: 250px;
-    }
-    
-    h1 {
-      font-size: 44px;
-
-      small {
-        margin-block: 16px;
-        font-size: 22px;
-        display: block;
-      }
-    }
-
-    .stars{
-      font-size: 42px;
-      margin-bottom: 16px;
-    }
-
-    .meta {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5em;
-
-      .companies {
-        display: flex;
-        flex-direction: column;
-
-        .company {
-          display: flex;
-          gap: 1em;
-          align-items: center;
-
-          img {
-            width: 2.4rem;
-            height: auto;
-          }
-        }
-      }
-      
-
-      .countries {
-        display: flex;
-
-        .country {
-          display: flex;
-          gap: 1em;
-          align-items: center;
-
-          &:not(:last-of-type)::after {
-            content: ','
-          }
-        }
-
-        img {
-          height: 2.4rem;
-          width: auto;
-        }
-      }
-    }
-
-    blockquote {
-      font-size: 20px;
-      font-style: italic;
-    }
-  }
-
-  .genres {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-  }
-
-  p {
-    margin-block: 30px;
-  }
-
-  h3 {
-    font-size: 38px;
-    margin-block: 20px;
-  }
-  hr {
-    margin-block: 4rem ;
-  }
-
-  .team {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    grid-auto-rows: minmax(1fr, auto); 
-    gap: 1rem;
-
-    li {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-
-      img {
-        height: 8rem;
-        width: auto;
-      }
-
-      div {
-        display: flex;
-        flex-direction: column;
-        gap: 1ch;
-      }
-    }
-  }
-
-  @media screen and (min-width: 680px) {
-    header {
-      flex-direction: row;
-      gap: 30px;
-    }
-  }
+<style lang="scss" global>
+  @import './+page.scss';
 </style>

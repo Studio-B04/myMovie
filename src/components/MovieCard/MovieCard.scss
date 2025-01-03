@@ -1,0 +1,33 @@
+article {
+  height: 100%;
+  border: 1px solid grey;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 1rem 1rem -1rem rgba(0, 0, 0, 0.75);
+
+  & > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+
+    h3 {
+      font-size: 1.4rem;
+      color: darkslategrey;
+    }
+
+    .score {
+      display: flex;
+      align-items: baseline;
+      gap: 1ch;
+    }
+
+    p {
+      overflow: hidden;
+      display: -webkit-box;
+      line-clamp: 5;
+      -webkit-line-clamp: 5;
+      -webkit-box-orient: vertical;
+    }
+  }
+}

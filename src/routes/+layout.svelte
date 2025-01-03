@@ -1,11 +1,16 @@
 <script>
-  import { onMount } from "svelte";
+  import { afterNavigate } from '$app/navigation';
+  import { page } from '$app/stores';
   import Header from "@components/Header/Header.svelte";
   import Footer from "@components/Footer/Footer.svelte";
+  import { tick } from 'svelte';
 
   let headerHeight = 0;
-  let footerHeight = 0;
+  let footerHeight = 0; 
+
+  afterNavigate(() => window.scrollTo({top: 0, behavior: "instant"}))
 </script>
+
 
 <Header on:updateHeight={({detail}) => {headerHeight = detail}} />
 

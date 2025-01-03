@@ -1,0 +1,117 @@
+.movie {
+  &__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+
+    a {
+      color: darkslategray;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    &__image {
+      flex-shrink: 0;
+      max-width: 100%;
+    }
+
+    &__details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+
+      &__title {
+        margin-block-end: -3rem;
+
+        small {
+          display: block;
+          font-size: 50%;
+          margin-block-start: 0.25em;
+          display: flex;
+          gap: 1em;
+          flex-wrap: wrap;
+        }
+
+        em {
+          display: block;
+          font-weight: normal;
+          font-size: 40%;
+          margin-block-start: 0.5em;
+          text-wrap: pretty;
+          color: #544;
+        }
+      }
+
+      &__countries {
+        display: flex;
+        gap: 1ch;
+
+        img {
+          width: 3rem;
+        }
+      }
+
+      &__reviews {
+        font-size: 2.4rem;
+        text-decoration: none !important;
+        color: #555 !important;
+
+        &:hover {
+          text-decoration: none !important;
+        }
+
+        small {
+          font-size: 0.9rem;
+          font-style: italic;
+        }
+      }
+
+      &__production {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        li {
+          margin-inline-start: 1rem;
+
+          &:before {
+            content: "•";
+            vertical-align: baseline;
+            margin-inline-end: 1ch;
+          }
+        }
+      }
+
+      &__overview {
+        margin-top: 1em;
+        text-indent: 1em;
+        font-size: 1.2rem;
+      }
+
+      &__genres {
+        margin-top: 2rem;
+        display: flex;
+        gap: 1rem;
+      }
+    }
+  }
+
+  &__section {
+    margin-top: 4rem;
+    padding-top: 4rem;
+    border-block-start: 1px solid lightslategray;
+  }
+}
+
+@media screen and (min-width: 980px) {
+  .movie {
+    &__header {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+  }
+}

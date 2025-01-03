@@ -1,0 +1,36 @@
+.reviews {
+  display: flex;
+  flex-direction: column;
+  margin-block-start: 2rem;
+
+  &__item {
+    padding: 1.5rem;
+
+    &:nth-child(odd) {
+      background-color: #f5f5f5;
+    }
+
+    &__user {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+
+      :global(h3) {
+        margin-bottom: 0 !important;
+      }
+
+      div {
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+        min-width: 15rem;
+        gap: 1ch;
+      }
+
+      p {
+        margin-block: auto;
+        margin-inline-start: 3rem;
+      }
+    }
+  }
+}

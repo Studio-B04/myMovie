@@ -1,0 +1,1 @@
+.button{appearance:none;padding:.75em 1.5em;font-size:1.15em;color:#fff;background-color:#2f4f4f;border:none}.button[disabled=true],.button:disabled{filter:grayscale(1);opacity:.5;cursor:not-allowed;pointer-events:none}

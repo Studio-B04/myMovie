@@ -135,3 +135,5 @@ dist
 
 # Build 
 build
+.svelte-kit
+.DS_Store

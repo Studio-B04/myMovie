@@ -91,9 +91,8 @@
   {/if}
 </section>
 
-<hr>
 
-<section class="movie__section" id="similar">
+<section class="movie__section" id="latest">
   <Title level={3} size="xl">Les films tendances</Title>
   <Latest max="10"/>
 </section>

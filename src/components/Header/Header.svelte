@@ -26,13 +26,14 @@
 
 <style>
   header {
-    padding: 20px;
+    padding: 1rem;
     background-color: darkslategrey;
     color: white;
-    box-shadow: 0 0 15px 5px rgba(0,0,0,0.75);
+    box-shadow: 0 0 1rem 0.5rem rgba(0,0,0,0.75);
     z-index: 2;
     position: sticky;
     inset-block-start: 0;
+    inset-inline: 0;
 
     div {
       max-width: 1280px;
